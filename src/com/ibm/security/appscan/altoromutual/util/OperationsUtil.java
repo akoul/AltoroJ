@@ -26,6 +26,8 @@ public class OperationsUtil {
 				message = "ERROR: " + message;
 			} else {
 				message = amount + " was successfully transferred from Account " + debitActId + " into Account " + creditActId + " at " + new SimpleDateFormat().format(new Date()) + ".";
+				//Insecure Logging
+				Log4AltoroJ.getInstance().logError(amount + " was successfully transferred from Account " + debitActId + " into Account " + creditActId + " at " + new SimpleDateFormat().format(new Date()) + ".";)
 			}
 			
 			return message;
@@ -111,6 +113,8 @@ public class OperationsUtil {
 			message = "ERROR: " + message;
 		} else {
 			message = amount + " was successfully transferred from Account " + debitActId + " into Account " + creditActId + " at " + new SimpleDateFormat().format(new Date()) + ".";
+			//Insecure Logging
+			Log4AltoroJ.getInstance().logError(amount + " was successfully transferred from Account " + debitActId + " into Account " + creditActId + " at " + new SimpleDateFormat().format(new Date()) + ".")	
 		}
 		
 		return message;
@@ -138,6 +142,8 @@ public class OperationsUtil {
 		//Get username password and date 
 		String decodedToken = new String(Base64.decodeBase64(accessToken));
 		StringTokenizer tokenizer = new StringTokenizer(decodedToken,":");
+		//Insecure Logging
+		Log4AltoroJ.getInstance().logError(tokenizer)
 		String username = new String(Base64.decodeBase64(tokenizer.nextToken()));
 		return DBUtil.getUserInfo(username);
 		

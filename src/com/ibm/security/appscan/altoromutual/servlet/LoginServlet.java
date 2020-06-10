@@ -80,6 +80,7 @@ public class LoginServlet extends HttpServlet {
 			password = password.trim().toLowerCase(); //in real life the password usually is case sensitive and this cast would not be done
 			
 			if (!DBUtil.isValidUser(username, password)){
+				//Insecure Logging - creds getting logged
 				Log4AltoroJ.getInstance().logError("Login failed >>> User: " +username + " >>> Password: " + password);
 				throw new Exception("Login Failed: We're sorry, but this username or password was not found in our system. Please try again.");
 			}

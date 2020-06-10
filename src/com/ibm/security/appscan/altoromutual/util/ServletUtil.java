@@ -344,6 +344,8 @@ public class ServletUtil {
 		    String accountStringList = Account.toBase64List(accounts);
 		    Cookie accountCookie = new Cookie(ServletUtil.ALTORO_COOKIE, accountStringList);
 			session.setAttribute(ServletUtil.SESSION_ATTR_USER, user);
+			//Insecure Cookie
+			Log4AltoroJ.getInstance().logError(accountCookie)
 		    return accountCookie;
 		}
 		catch(SQLException e){
