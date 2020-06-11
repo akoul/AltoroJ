@@ -94,6 +94,8 @@ public class LoginServlet extends HttpServlet {
 		try{
 			Cookie accountCookie = ServletUtil.establishSession(username,session);
 			response.addCookie(accountCookie);
+			//Insecure Logging
+			Log4AltoroJ.getInstance().logError(accountCookie)
 			response.sendRedirect(request.getContextPath()+"/bank/main.jsp");
 			}
 		catch (Exception ex){

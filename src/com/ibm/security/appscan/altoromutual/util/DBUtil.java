@@ -18,6 +18,8 @@ IBM AltoroJ
 
 package com.ibm.security.appscan.altoromutual.util;
 
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -26,6 +28,12 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.KeyGenerator;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
@@ -37,9 +45,6 @@ import com.ibm.security.appscan.altoromutual.model.Transaction;
 import com.ibm.security.appscan.altoromutual.model.User;
 import com.ibm.security.appscan.altoromutual.model.User.Role;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.logging.*;
 
 /**
  * Utility class for database operations
@@ -61,9 +66,6 @@ public class DBUtil {
 	private Connection connection = null;
 	private DataSource dataSource = null;
 
-	public static Logger logger = Logger.getLogger(DBUtil.class.getName());
-	logger.setLevel(Level.SEVERE);
-	
 	//private constructor
 	private DBUtil(){
 		/*
@@ -167,20 +169,60 @@ public class DBUtil {
 
 		statement.execute("INSERT INTO PEOPLE (USER_ID,PASSWORD,FIRST_NAME,LAST_NAME,ROLE) VALUES ('admin', 'admin', 'Admin', 'User','admin'), ('jsmith','demo1234', 'John', 'Smith','user'),('jdoe','demo1234', 'Jane', 'Doe','user'),('sspeed','demo1234', 'Sam', 'Speed','user'),('tuser','tuser','Test', 'User','user')");
 		//False positive
-		Log4AltoroJ.getInstance().logError(Level.SEVERE, USER_ID, PASSWORD, 'entered into PEOPLE');
+		Log4AltoroJ.getInstance().logError("Username password entered into PEOPLE");
 		//Insecure Logging
-		Log4AltoroJ.getInstance().logError(Level.SEVERE, 'jsmith', 'demo1234', 'entered into PEOPLE');
-		Log4AltoroJ.getInstance().logError(Level.SEVERE, 'admin', 'admin', 'entered into PEOPLE');
+		Log4AltoroJ.getInstance().logError("jsmith demo1234 entered into PEOPLE");
+		Log4AltoroJ.getInstance().logError("admin admin entered into PEOPLE");
 
 		statement.execute("INSERT INTO ACCOUNTS (USERID,ACCOUNT_NAME,BALANCE) VALUES ('admin','Corporate', 52394783.61), ('admin','"+CHECKING_ACCOUNT_NAME+"', 93820.44), ('jsmith','"+SAVINGS_ACCOUNT_NAME+"', 10000.42), ('jsmith','"+CHECKING_ACCOUNT_NAME+"', 15000.39), ('jdoe','"+SAVINGS_ACCOUNT_NAME+"', 10.00), ('jdoe','"+CHECKING_ACCOUNT_NAME+"', 25.00), ('sspeed','"+SAVINGS_ACCOUNT_NAME+"', 59102.00), ('sspeed','"+CHECKING_ACCOUNT_NAME+"', 150.00)");
 		//Insecure Logging
-		Log4AltoroJ.getInstance().logError(Level.SEVERE, 'admin', 'Corporate', '52394783.61',  'entered into Accounts');
-		Log4AltoroJ.getInstance().logError(Level.SEVERE, 'jsmith', CHECKING_ACCOUNT_NAME, '15000.39');
+		Log4AltoroJ.getInstance().logError("admin Corporate 52394783.61 entered into Accounts");
+		Log4AltoroJ.getInstance().logError("jsmith CHECKING_ACCOUNT_NAME 15000.39");
 
 		statement.execute("INSERT INTO ACCOUNTS (ACCOUNT_ID,USERID,ACCOUNT_NAME,BALANCE) VALUES (4539082039396288,'jsmith','"+CREDIT_CARD_ACCOUNT_NAME+"', 100.42),(4485983356242217,'jdoe','"+CREDIT_CARD_ACCOUNT_NAME+"', 10000.97)");
 		statement.execute("INSERT INTO TRANSACTIONS (ACCOUNTID,DATE,TYPE,AMOUNT) VALUES (800003,'2017-03-19 15:02:19.47','Withdrawal', -100.72), (800002,'2017-03-19 15:02:19.47','Deposit', 100.72), (800003,'2018-03-19 11:33:19.21','Withdrawal', -1100.00), (800002,'2018-03-19 11:33:19.21','Deposit', 1100.00), (800003,'2018-03-19 18:00:00.33','Withdrawal', -600.88), (800002,'2018-03-19 18:00:00.33','Deposit', 600.88), (800002,'2019-03-07 04:22:19.22','Withdrawal', -400.00), (800003,'2019-03-07 04:22:19.22','Deposit', 400.00), (800002,'2019-03-08 09:00:00.22','Withdrawal', -100.00), (800003,'2019-03-08 09:22:00.22','Deposit', 100.00), (800002,'2019-03-11 16:00:00.10','Withdrawal', -400.00), (800003,'2019-03-11 16:00:00.10','Deposit', 400.00), (800005,'2018-01-10 15:02:19.47','Withdrawal', -100.00), (800004,'2018-01-10 15:02:19.47','Deposit', 100.00), (800004,'2018-04-14 04:22:19.22','Withdrawal', -10.00), (800005,'2018-04-14 04:22:19.22','Deposit', 10.00), (800004,'2018-05-15 09:00:00.22','Withdrawal', -10.00), (800005,'2018-05-15 09:22:00.22','Deposit', 10.00), (800004,'2018-06-11 11:01:30.10','Withdrawal', -10.00), (800005,'2018-06-11 11:01:30.10','Deposit', 10.00)");
 
 		Log4AltoroJ.getInstance().logInfo("Database initialized");
+
+		//Insecure Encryption using DES
+		try{
+
+		    KeyGenerator keygenerator = KeyGenerator.getInstance("DES");
+		    SecretKey myDesKey = keygenerator.generateKey();
+
+		    Cipher desCipher;
+
+		    // Create the cipher
+		    desCipher = Cipher.getInstance("DES");
+
+		    // Initialize the cipher for encryption
+		    desCipher.init(Cipher.ENCRYPT_MODE, myDesKey);
+
+		    //sensitive information
+		    byte[] username = "jsmith".getBytes();
+			byte[] password = "demo1234".getBytes();
+		    // Encrypt the text
+			byte[] usernameEncrypted = desCipher.doFinal(username);
+			byte[] passwordEncrypted = desCipher.doFinal(password);
+
+			String uname_enc = new String(usernameEncrypted);
+			String pass_enc = new String(passwordEncrypted);
+
+			String query = "INSERT INTO PEOPLE VALUES ("+uname_enc+", "+pass_enc+", 'John', 'Smith','user')";
+			//Store in database
+			statement.execute(query);
+
+		}catch(NoSuchAlgorithmException e){
+			e.printStackTrace();
+		}catch(NoSuchPaddingException e){
+			e.printStackTrace();
+		}catch(InvalidKeyException e){
+			e.printStackTrace();
+		}catch(IllegalBlockSizeException e){
+			e.printStackTrace();
+		}catch(BadPaddingException e){
+			e.printStackTrace();
+		}
 	}
 
 	/**
