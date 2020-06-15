@@ -18,7 +18,9 @@ IBM AltoroJ
 
 package com.ibm.security.appscan.altoromutual.util;
 
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -221,6 +223,31 @@ public class DBUtil {
 		}catch(IllegalBlockSizeException e){
 			e.printStackTrace();
 		}catch(BadPaddingException e){
+			e.printStackTrace();
+		}
+
+
+		//Non-random salt for strong crypto
+		MessageDigest md;
+		String login_creds = "Username: Admin Password:Admin";
+		try{
+		md = MessageDigest.getInstance("SHA-256");
+		//Initializing salt with 0
+		byte[] salt = new byte[16];
+		// Passing the salt to the digest for the computation
+		md.update(salt);
+
+		//Generating the salted hash
+		byte[] hashedCreds = md.digest(login_creds.getBytes(StandardCharsets.UTF_8));
+		String query = new String(hashedCreds);
+		//Store in database
+		statement.execute(query);
+		
+		//Log
+		Log4AltoroJ.getInstance().logInfo(query);
+		
+		}
+		catch(NoSuchAlgorithmException e){
 			e.printStackTrace();
 		}
 	}

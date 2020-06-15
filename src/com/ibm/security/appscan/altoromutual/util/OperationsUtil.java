@@ -10,6 +10,8 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringEscapeUtils;
+
+import com.ibm.security.appscan.Log4AltoroJ;
 import com.ibm.security.appscan.altoromutual.model.Account;
 import com.ibm.security.appscan.altoromutual.model.User;
 
@@ -27,7 +29,7 @@ public class OperationsUtil {
 			} else {
 				message = amount + " was successfully transferred from Account " + debitActId + " into Account " + creditActId + " at " + new SimpleDateFormat().format(new Date()) + ".";
 				//Insecure Logging
-				Log4AltoroJ.getInstance().logError(amount + " was successfully transferred from Account " + debitActId + " into Account " + creditActId + " at " + new SimpleDateFormat().format(new Date()) + ".";)
+				Log4AltoroJ.getInstance().logError(amount + " was successfully transferred from Account " + debitActId + " into Account " + creditActId + " at " + new SimpleDateFormat().format(new Date()) + ".");
 			}
 			
 			return message;
@@ -114,7 +116,7 @@ public class OperationsUtil {
 		} else {
 			message = amount + " was successfully transferred from Account " + debitActId + " into Account " + creditActId + " at " + new SimpleDateFormat().format(new Date()) + ".";
 			//Insecure Logging
-			Log4AltoroJ.getInstance().logError(amount + " was successfully transferred from Account " + debitActId + " into Account " + creditActId + " at " + new SimpleDateFormat().format(new Date()) + ".")	
+			Log4AltoroJ.getInstance().logError(amount + " was successfully transferred from Account " + debitActId + " into Account " + creditActId + " at " + new SimpleDateFormat().format(new Date()) + ".");	
 		}
 		
 		return message;
@@ -143,7 +145,7 @@ public class OperationsUtil {
 		String decodedToken = new String(Base64.decodeBase64(accessToken));
 		StringTokenizer tokenizer = new StringTokenizer(decodedToken,":");
 		//Insecure Logging
-		Log4AltoroJ.getInstance().logError(tokenizer)
+		Log4AltoroJ.getInstance().logError(tokenizer.toString());
 		String username = new String(Base64.decodeBase64(tokenizer.nextToken()));
 		return DBUtil.getUserInfo(username);
 		
